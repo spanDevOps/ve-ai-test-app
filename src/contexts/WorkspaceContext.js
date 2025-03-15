@@ -3,14 +3,9 @@ import React, { createContext, useContext } from 'react';
 const WorkspaceContext = createContext();
 
 export function WorkspaceProvider({ children }) {
-  let workspaceId = null;
-  const pathname = window.location.pathname;
-
-  // Extract workspace ID from path (added by Lambda@Edge)
-  const match = pathname.match(/^\/workspace-([^/]+)/);
-  if (match) {
-    workspaceId = `workspace-${match[1]}`;
-  }
+  // Extract workspace ID from path (set by Lambda@Edge)
+  const pathParts = window.location.pathname.split('/');
+  const workspaceId = pathParts[1] || null;
 
   return (
     <WorkspaceContext.Provider value={{ workspaceId }}>

@@ -3,15 +3,15 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { WorkspaceProvider, useWorkspace } from './contexts/WorkspaceContext';
 import './App.css';
 
-// Workspace layout component that checks for valid workspace
-function WorkspaceLayout({ children }) {
+// Main dashboard component
+function Dashboard() {
   const { workspaceId } = useWorkspace();
   
   if (!workspaceId) {
     return (
       <div className="error-page">
         <h1>404 - Not Found</h1>
-        <p>Invalid workspace path</p>
+        <p>Invalid workspace configuration</p>
       </div>
     );
   }
@@ -19,19 +19,10 @@ function WorkspaceLayout({ children }) {
   return (
     <div className="workspace-layout">
       <div className="workspace-badge">Custom Domain</div>
-      {children}
-    </div>
-  );
-}
-
-// Main dashboard component
-function Dashboard() {
-  const { workspaceId } = useWorkspace();
-  
-  return (
-    <div className="dashboard">
-      <h1>Welcome to {workspaceId}</h1>
-      <p>This is your VE.AI workspace dashboard</p>
+      <div className="dashboard">
+        <h1>Welcome to {workspaceId}</h1>
+        <p>This is your VE.AI workspace dashboard</p>
+      </div>
     </div>
   );
 }
@@ -42,29 +33,8 @@ function App() {
     <Router>
       <WorkspaceProvider>
         <Routes>
-          {/* Handle workspace paths from Lambda@Edge */}
-          <Route path="/workspace-:id" element={
-            <WorkspaceLayout>
-              <Dashboard />
-            </WorkspaceLayout>
-          } />
-          <Route path="/workspace-:id/*" element={
-            <WorkspaceLayout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="*" element={<Navigate to="dashboard" />} />
-              </Routes>
-            </WorkspaceLayout>
-          } />
-
-          {/* Show 404 for non-workspace paths */}
-          <Route path="*" element={
-            <div className="error-page">
-              <h1>404 - Not Found</h1>
-              <p>The page you're looking for doesn't exist.</p>
-            </div>
-          } />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="*" element={<Dashboard />} />
         </Routes>
       </WorkspaceProvider>
     </Router>
