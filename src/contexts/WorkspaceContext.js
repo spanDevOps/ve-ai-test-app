@@ -1,28 +1,31 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { createContext, useContext } from 'react';
 
 const WorkspaceContext = createContext();
 
-export function useWorkspace() {
-  return useContext(WorkspaceContext);
-}
-
 export function WorkspaceProvider({ children }) {
-  const [workspaceId, setWorkspaceId] = useState(null);
-  const location = useLocation();
+  let workspaceId = null;
+  const pathname = window.location.pathname;
 
-  useEffect(() => {
-    // Extract workspace ID from path: /workspace-1/path -> workspace-1
-    const path = location.pathname;
-    const match = path.match(/^\/([^/]+)/);
-    if (match && match[1].startsWith('workspace-')) {
-      setWorkspaceId(match[1]);
-    }
-  }, [location]);
+  // Extract workspace ID from path for both domain types
+  if (pathname.startsWith('/workspace-')) {
+    // Path-based routing: /workspace-1/dashboard
+    workspaceId = pathname.split('/')[1];
+  } else if (window.location.hostname.endsWith('ve.ai')) {
+    // VE.AI domain: workspace-1.ve.ai
+    workspaceId = window.location.hostname.split('.')[0];
+  }
 
   return (
-    <WorkspaceContext.Provider value={{ workspaceId, setWorkspaceId }}>
+    <WorkspaceContext.Provider value={{ workspaceId }}>
       {children}
     </WorkspaceContext.Provider>
   );
+}
+
+export function useWorkspace() {
+  const context = useContext(WorkspaceContext);
+  if (!context) {
+    throw new Error('useWorkspace must be used within a WorkspaceProvider');
+  }
+  return context;
 }

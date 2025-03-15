@@ -188,6 +188,7 @@ main {
 .workspace-layout {
   padding: 20px;
   position: relative;
+  min-height: 100vh;
 }
 
 /* Workspace badge */
@@ -199,31 +200,52 @@ main {
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
-  color: white;
-  background: #2563eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
 
-/* Dashboard */
+.workspace-badge:contains('Custom Domain') {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.workspace-badge:contains('Development') {
+  background-color: #2196F3;
+  color: white;
+}
+
 .dashboard {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 40px 20px;
 }
 
 .dashboard h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: #1f2937;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #333;
 }
 
 .dashboard p {
-  font-size: 1.125rem;
-  color: #4b5563;
+  font-size: 1.2em;
+  color: #666;
+  line-height: 1.6;
 }
 
-/* Error page */
+.workspace-info {
+  margin-top: 40px;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border-left: 4px solid #2196F3;
+}
+
+.workspace-info p {
+  margin: 10px 0;
+  font-family: monospace;
+  font-size: 14px;
+  color: #333;
+}
+
 .error-page {
   display: flex;
   flex-direction: column;
@@ -232,15 +254,18 @@ main {
   min-height: 100vh;
   text-align: center;
   padding: 20px;
+  background: #f8f9fa;
 }
 
 .error-page h1 {
-  font-size: 3rem;
-  color: #1f2937;
-  margin-bottom: 1rem;
+  font-size: 3em;
+  color: #dc3545;
+  margin-bottom: 20px;
 }
 
 .error-page p {
-  font-size: 1.25rem;
-  color: #4b5563;
+  font-size: 1.2em;
+  color: #6c757d;
+  max-width: 500px;
+  margin: 0 auto;
 }

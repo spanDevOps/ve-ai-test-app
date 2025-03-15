@@ -8,7 +8,12 @@ function WorkspaceLayout({ children }) {
   const { workspaceId } = useWorkspace();
   
   if (!workspaceId) {
-    return <div>Invalid workspace path</div>;
+    return (
+      <div className="error-page">
+        <h1>Invalid Workspace</h1>
+        <p>Please check your URL and try again.</p>
+      </div>
+    );
   }
 
   return (
@@ -30,6 +35,10 @@ function Dashboard() {
     <div className="dashboard">
       <h1>Welcome to Workspace: {workspaceId}</h1>
       <p>This is your VE.AI workspace dashboard</p>
+      <div className="workspace-info">
+        <p>Domain: {window.location.hostname}</p>
+        <p>Path: {window.location.pathname}</p>
+      </div>
     </div>
   );
 }
@@ -40,25 +49,25 @@ function App() {
     <Router>
       <WorkspaceProvider>
         <Routes>
-          {/* Redirect root to 404 since all valid paths must have workspace ID */}
-          <Route path="/" element={<Navigate to="/404" replace />} />
+          {/* Redirect root to 404 since all valid paths must include workspace */}
+          <Route path="/" element={<Navigate to="/404" />} />
           
-          {/* Workspace routes */}
+          {/* Handle workspace paths */}
           <Route path="/:workspaceId/*" element={
             <WorkspaceLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                {/* Add more workspace-specific routes here */}
+                <Route path="*" element={<Navigate to="dashboard" />} />
               </Routes>
             </WorkspaceLayout>
           } />
 
-          {/* 404 route */}
+          {/* 404 page */}
           <Route path="/404" element={
             <div className="error-page">
               <h1>404 - Not Found</h1>
-              <p>Please check your workspace URL</p>
+              <p>The page you're looking for doesn't exist.</p>
             </div>
           } />
         </Routes>
