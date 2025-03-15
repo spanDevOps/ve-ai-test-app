@@ -20,12 +20,22 @@ frontend:
         - key: 'Cache-Control'
           value: 'public, max-age=0, s-maxage=31536000'
   customRules:
+    # Handle workspace paths from Lambda@Edge
+    - source: '/workspace-<*>'
+      target: '/index.html'
+      status: '200'
     - source: '/workspace-<*>/<*>'
       target: '/index.html'
       status: '200'
+    # Redirect root to 404
+    - source: '/'
+      target: '/index.html'
+      status: '404'
+    # Handle static files
+    - source: '/<*\.[a-z]+>'
+      target: '/<*>'
+      status: '200'
+    # All other paths to 404
     - source: '/<*>'
       target: '/index.html'
-      status: '404-200'
-    - source: '</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>'
-      target: '/index.html'
-      status: '200'
+      status: '404'

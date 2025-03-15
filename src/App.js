@@ -10,8 +10,8 @@ function WorkspaceLayout({ children }) {
   if (!workspaceId) {
     return (
       <div className="error-page">
-        <h1>Invalid Workspace Path</h1>
-        <p>Please check your URL and try again.</p>
+        <h1>404 - Not Found</h1>
+        <p>Invalid workspace path</p>
       </div>
     );
   }
@@ -43,6 +43,11 @@ function App() {
       <WorkspaceProvider>
         <Routes>
           {/* Handle workspace paths from Lambda@Edge */}
+          <Route path="/workspace-:id" element={
+            <WorkspaceLayout>
+              <Dashboard />
+            </WorkspaceLayout>
+          } />
           <Route path="/workspace-:id/*" element={
             <WorkspaceLayout>
               <Routes>
@@ -53,7 +58,7 @@ function App() {
             </WorkspaceLayout>
           } />
 
-          {/* Redirect invalid paths to error page */}
+          {/* Show 404 for non-workspace paths */}
           <Route path="*" element={
             <div className="error-page">
               <h1>404 - Not Found</h1>
