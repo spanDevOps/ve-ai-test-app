@@ -10,7 +10,7 @@ function WorkspaceLayout({ children }) {
   if (!workspaceId) {
     return (
       <div className="error-page">
-        <h1>Invalid Workspace</h1>
+        <h1>Invalid Workspace Path</h1>
         <p>Please check your URL and try again.</p>
       </div>
     );
@@ -18,10 +18,7 @@ function WorkspaceLayout({ children }) {
 
   return (
     <div className="workspace-layout">
-      {/* Add a badge to show workspace type */}
-      <div className="workspace-badge">
-        {window.location.hostname.endsWith('devopsify.shop') ? 'Custom Domain' : 'Development'}
-      </div>
+      <div className="workspace-badge">Custom Domain</div>
       {children}
     </div>
   );
@@ -33,12 +30,8 @@ function Dashboard() {
   
   return (
     <div className="dashboard">
-      <h1>Welcome to Workspace: {workspaceId}</h1>
+      <h1>Welcome to {workspaceId}</h1>
       <p>This is your VE.AI workspace dashboard</p>
-      <div className="workspace-info">
-        <p>Domain: {window.location.hostname}</p>
-        <p>Path: {window.location.pathname}</p>
-      </div>
     </div>
   );
 }
@@ -49,11 +42,8 @@ function App() {
     <Router>
       <WorkspaceProvider>
         <Routes>
-          {/* Redirect root to 404 since all valid paths must include workspace */}
-          <Route path="/" element={<Navigate to="/404" />} />
-          
-          {/* Handle workspace paths */}
-          <Route path="/:workspaceId/*" element={
+          {/* Handle workspace paths from Lambda@Edge */}
+          <Route path="/workspace-:id/*" element={
             <WorkspaceLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
@@ -63,8 +53,8 @@ function App() {
             </WorkspaceLayout>
           } />
 
-          {/* 404 page */}
-          <Route path="/404" element={
+          {/* Redirect invalid paths to error page */}
+          <Route path="*" element={
             <div className="error-page">
               <h1>404 - Not Found</h1>
               <p>The page you're looking for doesn't exist.</p>

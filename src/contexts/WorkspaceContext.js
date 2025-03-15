@@ -6,13 +6,10 @@ export function WorkspaceProvider({ children }) {
   let workspaceId = null;
   const pathname = window.location.pathname;
 
-  // Extract workspace ID from path for both domain types
-  if (pathname.startsWith('/workspace-')) {
-    // Path-based routing: /workspace-1/dashboard
-    workspaceId = pathname.split('/')[1];
-  } else if (window.location.hostname.endsWith('ve.ai')) {
-    // VE.AI domain: workspace-1.ve.ai
-    workspaceId = window.location.hostname.split('.')[0];
+  // Extract workspace ID from path (added by Lambda@Edge)
+  const match = pathname.match(/^\/workspace-([^/]+)/);
+  if (match) {
+    workspaceId = `workspace-${match[1]}`;
   }
 
   return (
