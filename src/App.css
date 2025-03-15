@@ -183,3 +183,64 @@ main {
 .domain-mappings tr:hover {
   background-color: #f1f8ff;
 }
+
+/* Main layout */
+.workspace-layout {
+  padding: 20px;
+  position: relative;
+}
+
+/* Workspace badge */
+.workspace-badge {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background: #2563eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Dashboard */
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.dashboard h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.dashboard p {
+  font-size: 1.125rem;
+  color: #4b5563;
+}
+
+/* Error page */
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-page h1 {
+  font-size: 3rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.error-page p {
+  font-size: 1.25rem;
+  color: #4b5563;
+}
