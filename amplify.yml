@@ -20,7 +20,7 @@ frontend:
         - key: 'Cache-Control'
           value: 'public, max-age=0, s-maxage=31536000'
         - key: 'Access-Control-Allow-Origin'
-          value: 'https://d3n96herxxe2fs.cloudfront.net'
+          value: '*'
   customRules:
     # Serve index.html for all non-static paths
     - source: '</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>'
