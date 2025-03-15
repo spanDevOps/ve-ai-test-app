@@ -20,7 +20,7 @@ frontend:
         - key: 'Cache-Control'
           value: 'public, max-age=0, s-maxage=31536000'
   customRules:
-    # All paths should serve index.html for SPA routing
+    # Serve index.html for all non-static paths
     - source: '</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>'
       target: '/index.html'
       status: '200'
