@@ -44,12 +44,16 @@
     <script>
         // Extract workspace ID and path
         const path = window.location.pathname;
-        const match = path.match(/workspace-(\d+)(\/.*)?/);
+        const match = path.match(/workspace-(\d+)(\/.*)?/) || path.match(/^(\/[^/]+)(\/.*)?$/);
         
         if (match) {
-            const [, workspaceId, remainingPath = ''] = match;
+            const [, workspaceIdOrPath, remainingPath = ''] = match;
+            const isWorkspacePrefix = workspaceIdOrPath.startsWith('workspace-');
+            const workspaceId = isWorkspacePrefix ? workspaceIdOrPath.replace('workspace-', '') : '?';
+            const displayPath = isWorkspacePrefix ? remainingPath : path;
+            
             document.getElementById('workspace-id').textContent = workspaceId;
-            document.getElementById('path').textContent = remainingPath || '/';
+            document.getElementById('path').textContent = displayPath || '/';
             document.title = `Workspace ${workspaceId}`;
         } else {
             document.getElementById('error').style.display = 'block';
