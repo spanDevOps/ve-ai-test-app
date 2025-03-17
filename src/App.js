@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { WorkspaceProvider, useWorkspace } from './contexts/WorkspaceContext';
 import './App.css';
@@ -7,7 +7,15 @@ import './App.css';
 function Dashboard() {
   const { workspaceId } = useWorkspace();
   
+  useEffect(() => {
+    console.log('Dashboard mounted');
+    console.log('Current workspace:', workspaceId);
+    console.log('Full URL:', window.location.href);
+    console.log('Current path:', window.location.pathname);
+  }, [workspaceId]);
+
   if (!workspaceId) {
+    console.log('No workspace ID found');
     return (
       <div className="error-page">
         <h1>404 - Not Found</h1>
@@ -16,6 +24,7 @@ function Dashboard() {
     );
   }
 
+  console.log('Rendering dashboard for workspace:', workspaceId);
   return (
     <div className="workspace-layout">
       <div className="workspace-badge">Custom Domain</div>
@@ -29,6 +38,12 @@ function Dashboard() {
 
 // Root component that sets up routing
 function App() {
+  useEffect(() => {
+    console.log('App mounted');
+    console.log('Initial URL:', window.location.href);
+    console.log('Initial path:', window.location.pathname);
+  }, []);
+
   return (
     <Router>
       <WorkspaceProvider>
