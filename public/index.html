@@ -23,6 +23,11 @@
             margin: 0;
             color: #333;
         }
+        .path {
+            color: #666;
+            margin-top: 1rem;
+            font-family: monospace;
+        }
         .error {
             color: #dc3545;
             margin-top: 1rem;
@@ -33,19 +38,23 @@
 <body>
     <div class="container">
         <h1>Workspace <span id="workspace-id"></span></h1>
+        <div id="path" class="path"></div>
         <div id="error" class="error">Invalid workspace path</div>
     </div>
     <script>
-        // Extract workspace ID from path
+        // Extract workspace ID and path
         const path = window.location.pathname;
-        const match = path.match(/workspace-(\d+)/);
+        const match = path.match(/workspace-(\d+)(\/.*)?/);
         
         if (match) {
-            document.getElementById('workspace-id').textContent = match[1];
-            document.title = `Workspace ${match[1]}`;
+            const [, workspaceId, remainingPath = ''] = match;
+            document.getElementById('workspace-id').textContent = workspaceId;
+            document.getElementById('path').textContent = remainingPath || '/';
+            document.title = `Workspace ${workspaceId}`;
         } else {
             document.getElementById('error').style.display = 'block';
             document.getElementById('workspace-id').textContent = '?';
+            document.getElementById('path').style.display = 'none';
         }
     </script>
 </body>
