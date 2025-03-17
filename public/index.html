@@ -42,15 +42,15 @@
         <div id="error" class="error">Invalid workspace path</div>
     </div>
     <script>
-        // Extract workspace ID and path
-        const path = window.location.pathname;
-        const match = path.match(/workspace-(\d+)(\/.*)?/);
+        // Get workspace ID from the current URL
+        const currentPath = window.location.pathname;
+        const match = currentPath.match(/workspace-(\d+)/);
         
         if (match) {
-            const [, workspaceId, remainingPath = ''] = match;
-            document.getElementById('workspace-id').textContent = workspaceId;
-            document.getElementById('path').textContent = remainingPath || '/';
-            document.title = `Workspace ${workspaceId}`;
+            const workspaceNumber = match[1];
+            document.getElementById('workspace-id').textContent = workspaceNumber;
+            document.getElementById('path').textContent = currentPath;
+            document.title = `Workspace ${workspaceNumber}`;
         } else {
             document.getElementById('error').style.display = 'block';
             document.getElementById('workspace-id').textContent = '?';
