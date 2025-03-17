@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { WorkspaceProvider, useWorkspace } from './contexts/WorkspaceContext';
 import './App.css';
 
@@ -29,11 +29,14 @@ function Dashboard() {
 
 // Root component that sets up routing
 function App() {
+  const workspaceId = window.location.pathname.split('/')[1];
+  
   return (
-    <Router basename={window.location.pathname.split('/')[1]}>
+    <Router>
       <WorkspaceProvider>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path={`/${workspaceId}`} element={<Dashboard />} />
+          <Route path={`/${workspaceId}/*`} element={<Dashboard />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </WorkspaceProvider>
