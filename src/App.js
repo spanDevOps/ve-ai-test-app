@@ -30,7 +30,7 @@ function Dashboard() {
 // Root component that sets up routing
 function App() {
   return (
-    <Router>
+    <Router basename={window.location.pathname.split('/')[1]}>
       <WorkspaceProvider>
         <Routes>
           <Route path="/" element={<Dashboard />} />
