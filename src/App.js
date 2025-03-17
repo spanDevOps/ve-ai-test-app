@@ -38,14 +38,19 @@ function Dashboard() {
 
 // Root component that sets up routing
 function App() {
+  const basename = window.location.pathname.startsWith('/workspace-') 
+    ? `/${window.location.pathname.split('/')[1]}`
+    : '';
+
   useEffect(() => {
     console.log('App mounted');
     console.log('Initial URL:', window.location.href);
     console.log('Initial path:', window.location.pathname);
-  }, []);
+    console.log('Using basename:', basename);
+  }, [basename]);
 
   return (
-    <Router>
+    <Router basename={basename}>
       <WorkspaceProvider>
         <Routes>
           <Route path="/*" element={<Dashboard />} />
