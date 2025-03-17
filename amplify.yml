@@ -1,28 +1,11 @@
 version: 1
 frontend:
   phases:
-    preBuild:
-      commands:
-        - npm ci
     build:
-      commands:
-        - npm run build
+      commands: []
   artifacts:
-    baseDirectory: build
+    baseDirectory: public
     files:
       - '**/*'
   cache:
-    paths:
-      - node_modules/**/*
-  customHeaders:
-    - pattern: '**/*'
-      headers:
-        - key: 'Cache-Control'
-          value: 'public, max-age=0, s-maxage=31536000'
-        - key: 'Access-Control-Allow-Origin'
-          value: '*'
-  customRules:
-    # Serve index.html for all non-static paths
-    - source: '</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>'
-      target: '/index.html'
-      status: '200'
+    paths: []
