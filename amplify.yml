@@ -10,12 +10,12 @@ frontend:
   cache:
     paths: []
   customRules:
+    - source: /workspace-<*>
+      target: /index.html
+      status: "200"
     - source: /workspace-<*>/<*>
       target: /index.html
       status: "200"
     - source: /<*>
-      target: /index.html
-      status: "404-200"
-    - source: </^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>
       target: /index.html
       status: "200"
