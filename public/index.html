@@ -30,18 +30,10 @@
         <h1>Workspace <span id="workspace-id">1</span></h1>
     </div>
     <script>
-        // Get workspace ID based on domain
-        const host = window.location.hostname;
-        let id = '1';
-        
-        if (host === 'gallery.devopsify.shop') {
-            id = '1';
-        } else if (host === 'photos.devopsify.shop') {
-            id = '2';
-        } else if (host === 'studio.devopsify.shop') {
-            id = '3';
-        }
-        
+        // Extract workspace ID from path
+        const path = window.location.pathname;
+        const match = path.match(/workspace-(\d+)/);
+        const id = match ? match[1] : '1';
         document.getElementById('workspace-id').textContent = id;
     </script>
 </body>
