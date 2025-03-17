@@ -28,23 +28,57 @@
             margin-top: 1rem;
             display: none;
         }
+        .workspace-info {
+            margin-top: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Workspace <span id="workspace-id"></span></h1>
         <div id="error" class="error">Invalid workspace path</div>
+        <div id="workspace-info" class="workspace-info"></div>
     </div>
     <script>
-        // Extract workspace ID from path
+        // Function to get URL parameters
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const pairs = queryString.split('&');
+            
+            for (const pair of pairs) {
+                if (pair === '') continue;
+                const [key, value] = pair.split('=');
+                params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+            }
+            
+            return params;
+        }
+
+        // Function to get workspace ID based on hostname
+        function getWorkspaceIdFromHost() {
+            const host = window.location.hostname;
+            if (host.startsWith('gallery.')) return '1';
+            if (host.startsWith('studio.')) return '3';
+            if (host.startsWith('photos.')) return '2';
+            return null;
+        }
+
+        // Extract workspace ID from path or hostname
         const path = window.location.pathname;
-        const match = path.match(/workspace-(\d+)/);
+        const pathMatch = path.match(/workspace-(\d+)/);
+        const workspaceId = pathMatch ? pathMatch[1] : getWorkspaceIdFromHost();
         
-        if (match) {
-            document.getElementById('workspace-id').textContent = match[1];
+        if (workspaceId) {
+            document.getElementById('workspace-id').textContent = workspaceId;
+            document.getElementById('workspace-info').textContent = `Domain: ${window.location.hostname}`;
+            document.title = `Workspace ${workspaceId}`;
         } else {
             document.getElementById('error').style.display = 'block';
             document.getElementById('workspace-id').textContent = '?';
+            document.getElementById('workspace-info').textContent = 'No workspace ID found';
         }
     </script>
 </body>
