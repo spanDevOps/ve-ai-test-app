@@ -11,13 +11,19 @@ frontend:
     paths: []
   customRules:
     - source: /workspace-<*>/<**>
-      target: /workspace-$1/$2
+      target: /index.html
       status: "200"
       condition: null
+      rewrites:
+        - source: /workspace-<*>/<**>
+          target: /workspace-$1/$2
     - source: /workspace-<*>
-      target: /workspace-$1/index.html
+      target: /index.html
       status: "200"
       condition: null
+      rewrites:
+        - source: /workspace-<*>
+          target: /workspace-$1
     - source: /<**>
       target: /index.html
       status: "404"
