@@ -10,11 +10,15 @@ frontend:
   cache:
     paths: []
   customRules:
-    - source: /workspace-<*>/<*>
+    - source: /workspace-<*>/<**>
       target: /index.html
       status: "200"
       condition: null
     - source: /workspace-<*>
       target: /index.html
       status: "200"
+      condition: null
+    - source: /<**>
+      target: /index.html
+      status: "404"
       condition: null
