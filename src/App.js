@@ -29,15 +29,11 @@ function Dashboard() {
 
 // Root component that sets up routing
 function App() {
-  const workspaceId = window.location.pathname.split('/')[1];
-  
   return (
     <Router>
       <WorkspaceProvider>
         <Routes>
-          <Route path={`/${workspaceId}`} element={<Dashboard />} />
-          <Route path={`/${workspaceId}/*`} element={<Dashboard />} />
-          <Route path="*" element={<Dashboard />} />
+          <Route path="/*" element={<Dashboard />} />
         </Routes>
       </WorkspaceProvider>
     </Router>
