@@ -1,62 +1,24 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { WorkspaceProvider, useWorkspace } from './contexts/WorkspaceContext';
+import React from 'react';
 import './App.css';
 
-// Main dashboard component
-function Dashboard() {
-  const { workspaceId } = useWorkspace();
-  
-  useEffect(() => {
-    console.log('Dashboard mounted');
-    console.log('Current workspace:', workspaceId);
-    console.log('Full URL:', window.location.href);
-    console.log('Current path:', window.location.pathname);
-  }, [workspaceId]);
-
-  if (!workspaceId) {
-    console.log('No workspace ID found');
-    return (
-      <div className="error-page">
-        <h1>404 - Not Found</h1>
-        <p>Invalid workspace configuration</p>
-      </div>
-    );
-  }
-
-  console.log('Rendering dashboard for workspace:', workspaceId);
-  return (
-    <div className="workspace-layout">
-      <div className="workspace-badge">Custom Domain</div>
-      <div className="dashboard">
-        <h1>Welcome to {workspaceId}</h1>
-        <p>This is your VE.AI workspace dashboard</p>
-      </div>
-    </div>
-  );
-}
-
-// Root component that sets up routing
 function App() {
-  const basename = window.location.pathname.startsWith('/workspace-') 
-    ? `/${window.location.pathname.split('/')[1]}`
-    : '';
+  const [workspaceId, setWorkspaceId] = React.useState(null);
 
-  useEffect(() => {
-    console.log('App mounted');
-    console.log('Initial URL:', window.location.href);
-    console.log('Initial path:', window.location.pathname);
-    console.log('Using basename:', basename);
-  }, [basename]);
+  React.useEffect(() => {
+    // Extract workspace ID from path or use default
+    const path = window.location.pathname;
+    const match = path.match(/workspace-(\d+)/);
+    const id = match ? match[1] : '1';
+    setWorkspaceId(id);
+  }, []);
 
   return (
-    <Router basename={basename}>
-      <WorkspaceProvider>
-        <Routes>
-          <Route path="/*" element={<Dashboard />} />
-        </Routes>
-      </WorkspaceProvider>
-    </Router>
+    <div className="App">
+      <header className="App-header">
+        <h1>Workspace {workspaceId}</h1>
+        <p>You are viewing workspace-{workspaceId}</p>
+      </header>
+    </div>
   );
 }
 
