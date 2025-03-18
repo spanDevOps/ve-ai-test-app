@@ -29,12 +29,13 @@
     </div>
 
     <script>
-        async function getDebugHeaders() {
+        async function getWorkspaceInfo() {
             try {
-                const response = await fetch('/');
-                // Look for x-workspace-id header first, fall back to x-debug-workspace
-                const workspaceId = response.headers.get('x-workspace-id') || response.headers.get('x-debug-workspace');
-                const originalHost = response.headers.get('x-original-host') || response.headers.get('x-debug-original-host');
+                // Create a new API endpoint that returns the workspace ID as JSON
+                const response = await fetch('/api/workspace-info');
+                const data = await response.json();
+                const workspaceId = data.workspaceId;
+                const originalDomain = data.originalDomain;
 
                 // Update page title with workspace ID
                 if (workspaceId) {
@@ -48,9 +49,8 @@
                 // Display debug info
                 const debugInfo = {
                     'Amplify Host': window.location.host,
-                    'Original Domain': originalHost || 'Not available',
-                    'Workspace ID': workspaceId || 'Not available',
-                    'Headers Found': JSON.stringify(Array.from(response.headers.entries()))
+                    'Original Domain': originalDomain || 'Not available',
+                    'Workspace ID': workspaceId || 'Not available'
                 };
 
                 document.getElementById('debug-info').innerHTML = 
@@ -59,14 +59,14 @@
                         .join('');
 
             } catch (error) {
-                console.error('Error fetching debug headers:', error);
+                console.error('Error fetching workspace info:', error);
                 document.getElementById('workspace-info').textContent = 'Error loading workspace info';
                 document.getElementById('debug-info').textContent = 'Error loading debug info';
             }
         }
 
-        // Fetch debug headers when page loads
-        getDebugHeaders();
+        // Fetch workspace info when page loads
+        getWorkspaceInfo();
     </script>
 </body>
 </html>
