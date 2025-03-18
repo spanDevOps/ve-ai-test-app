@@ -32,8 +32,9 @@
         async function getDebugHeaders() {
             try {
                 const response = await fetch('/');
-                const workspaceId = response.headers.get('x-debug-workspace');
-                const originalHost = response.headers.get('x-debug-original-host');
+                // Look for x-workspace-id header first, fall back to x-debug-workspace
+                const workspaceId = response.headers.get('x-workspace-id') || response.headers.get('x-debug-workspace');
+                const originalHost = response.headers.get('x-original-host') || response.headers.get('x-debug-original-host');
 
                 // Update page title with workspace ID
                 if (workspaceId) {
@@ -48,7 +49,8 @@
                 const debugInfo = {
                     'Amplify Host': window.location.host,
                     'Original Domain': originalHost || 'Not available',
-                    'Workspace ID': workspaceId || 'Not available'
+                    'Workspace ID': workspaceId || 'Not available',
+                    'Headers Found': JSON.stringify(Array.from(response.headers.entries()))
                 };
 
                 document.getElementById('debug-info').innerHTML = 
