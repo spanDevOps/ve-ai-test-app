@@ -1,110 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Workspace</title>
-    <meta name="x-debug-workspace" content="">
-    <meta name="x-debug-original-uri" content="">
-    <meta name="x-debug-transformed-uri" content="">
+    <title>Workspace Test Page</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .debug-info {
             background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
         }
-        .container {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            margin: 0;
-            color: #333;
-        }
-        .path {
-            color: #666;
-            margin-top: 1rem;
-            font-family: monospace;
-        }
-        .error {
-            color: #dc3545;
-            margin-top: 1rem;
-            display: none;
-        }
-        .debug {
-            margin-top: 1rem;
-            font-family: monospace;
-            font-size: 0.8em;
-            color: #666;
-            text-align: left;
+        .debug-info h3 {
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Workspace <span id="workspace-id"></span></h1>
-        <div id="path" class="path"></div>
-        <div id="error" class="error">Invalid workspace path</div>
-        <div id="debug" class="debug"></div>
+    <h1>Workspace Test Page</h1>
+    <div id="workspace-info">Loading workspace info...</div>
+
+    <div class="debug-info">
+        <h3>Debug Information</h3>
+        <div id="debug-info">Loading debug info...</div>
     </div>
+
     <script>
-        // Get workspace ID from the current URL
-        const currentPath = window.location.pathname;
-        const match = currentPath.match(/workspace-(\d+)/);
+        async function getDebugHeaders() {
+            try {
+                const response = await fetch('/');
+                const workspaceId = response.headers.get('x-debug-workspace');
+                const originalHost = response.headers.get('x-debug-original-host');
 
-        // Display debug info
-        const debugInfo = {
-            'Current Path': currentPath,
-            'Original URI': document.querySelector('meta[name="x-debug-original-uri"]')?.getAttribute('content') || 'Not available',
-            'Transformed URI': document.querySelector('meta[name="x-debug-transformed-uri"]')?.getAttribute('content') || 'Not available',
-            'Workspace ID': document.querySelector('meta[name="x-debug-workspace"]')?.getAttribute('content') || 'Not available'
-        };
-        
-        document.getElementById('debug').innerHTML = Object.entries(debugInfo)
-            .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
-            .join('');
-        
-        if (match) {
-            const workspaceNumber = match[1];
-            document.getElementById('workspace-id').textContent = workspaceNumber;
-            document.getElementById('path').textContent = currentPath;
-            document.title = `Workspace ${workspaceNumber}`;
-        } else {
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('workspace-id').textContent = '?';
-            document.getElementById('path').style.display = 'none';
-        }
-
-        // Function to update meta tags from response headers
-        function updateMetaTags() {
-            const headers = {
-                'x-debug-workspace': '',
-                'x-debug-original-uri': '',
-                'x-debug-transformed-uri': ''
-            };
-
-            // Get headers from the response
-            Object.keys(headers).forEach(header => {
-                const value = document.querySelector(`meta[name="${header}"]`);
-                if (value) {
-                    const headerValue = value.getAttribute('content');
-                    if (headerValue) {
-                        const meta = document.querySelector(`meta[name="${header}"]`);
-                        if (meta) {
-                            meta.setAttribute('content', headerValue);
-                        }
-                    }
+                // Update page title with workspace ID
+                if (workspaceId) {
+                    document.title = `Workspace ${workspaceId}`;
                 }
-            });
+
+                // Update workspace info
+                document.getElementById('workspace-info').textContent = 
+                    workspaceId ? `Current Workspace: ${workspaceId}` : 'No workspace ID found';
+
+                // Display debug info
+                const debugInfo = {
+                    'Amplify Host': window.location.host,
+                    'Original Domain': originalHost || 'Not available',
+                    'Workspace ID': workspaceId || 'Not available'
+                };
+
+                document.getElementById('debug-info').innerHTML = 
+                    Object.entries(debugInfo)
+                        .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
+                        .join('');
+
+            } catch (error) {
+                console.error('Error fetching debug headers:', error);
+                document.getElementById('workspace-info').textContent = 'Error loading workspace info';
+                document.getElementById('debug-info').textContent = 'Error loading debug info';
+            }
         }
 
-        // Call updateMetaTags when the page loads
-        window.addEventListener('load', updateMetaTags);
+        // Fetch debug headers when page loads
+        getDebugHeaders();
     </script>
 </body>
 </html>
