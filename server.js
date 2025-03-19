@@ -110,25 +110,31 @@ app.use((req, res, next) => {
   next();
 });
 
-// Add a simple API endpoint that returns all headers
+// API endpoint to return headers as JSON
 app.get('/api/headers', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Cache-Control', 'no-store');
+  // Explicitly log this endpoint was hit
+  console.log('API HEADERS ENDPOINT HIT');
   
   const response = {
     headers: req.headers,
     workspaceId: req.headers['x-workspace-id'] || 'NOT FOUND',
     amzWorkspaceId: req.headers['x-amz-workspace-id'] || 'NOT FOUND',
-    timestamp: new Date().toISOString()
   };
   
+  // Set CORS headers to ensure the response isn't cached
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.header('Pragma', 'no-cache');
+  res.header('Expires', '0');
+  
+  // Send the response as JSON
   res.status(200).json(response);
 });
 
-// Serve static files from the public directory
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Catch-all route for SPA
+// Catch-all route to serve the main HTML file
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
