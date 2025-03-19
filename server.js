@@ -110,10 +110,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// API endpoint to return headers as JSON
-app.get('/api/headers', (req, res) => {
+// API endpoint to return headers as JSON - added a more specific path to avoid routing conflicts
+app.get('/api/headers/json', (req, res) => {
   // Explicitly log this endpoint was hit
-  console.log('API HEADERS ENDPOINT HIT');
+  console.log('API HEADERS JSON ENDPOINT HIT');
+  console.log('Request headers:', JSON.stringify(req.headers, null, 2));
+  
+  // Log specific headers of interest
+  console.log('x-workspace-id:', req.headers['x-workspace-id'] || 'NOT FOUND');
+  console.log('x-amz-workspace-id:', req.headers['x-amz-workspace-id'] || 'NOT FOUND');
   
   const response = {
     headers: req.headers,
@@ -126,6 +131,34 @@ app.get('/api/headers', (req, res) => {
   res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.header('Pragma', 'no-cache');
   res.header('Expires', '0');
+  res.header('Content-Type', 'application/json');
+  
+  // Send the response as JSON
+  res.status(200).json(response);
+});
+
+// Keep the original endpoint for backward compatibility
+app.get('/api/headers', (req, res) => {
+  // Explicitly log this endpoint was hit
+  console.log('API HEADERS ENDPOINT HIT');
+  console.log('Request headers:', JSON.stringify(req.headers, null, 2));
+  
+  // Log specific headers of interest
+  console.log('x-workspace-id:', req.headers['x-workspace-id'] || 'NOT FOUND');
+  console.log('x-amz-workspace-id:', req.headers['x-amz-workspace-id'] || 'NOT FOUND');
+  
+  const response = {
+    headers: req.headers,
+    workspaceId: req.headers['x-workspace-id'] || 'NOT FOUND',
+    amzWorkspaceId: req.headers['x-amz-workspace-id'] || 'NOT FOUND',
+  };
+  
+  // Set CORS headers to ensure the response isn't cached
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.header('Pragma', 'no-cache');
+  res.header('Expires', '0');
+  res.header('Content-Type', 'application/json');
   
   // Send the response as JSON
   res.status(200).json(response);

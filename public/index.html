@@ -74,7 +74,8 @@
     <script>
         document.getElementById('fetchHeaders').addEventListener('click', async () => {
             try {
-                const response = await fetch('/api/headers', {
+                // Updated to use the more specific JSON endpoint
+                const response = await fetch('/api/headers/json', {
                     cache: 'no-store',
                     headers: {
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -102,6 +103,7 @@
             } catch (error) {
                 document.getElementById('headersResult').innerHTML = 
                     `<div style="color: red;">Error fetching headers: ${error.message}</div>`;
+                console.error('Error fetching headers:', error);
             }
         });
     </script>
