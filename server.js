@@ -25,9 +25,6 @@ app.use((req, res, next) => {
     { flag: 'a+' }
   );
   
-  // Add a special header to the response to indicate we processed it
-  res.setHeader('X-Header-Logged', 'true');
-  
   next();
 });
 
@@ -35,6 +32,15 @@ app.use((req, res, next) => {
 app.get('/api/workspace-info', (req, res) => {
   const workspaceId = req.headers['x-workspace-id'] || null;
   const originalDomain = req.headers['x-debug-original-domain'] || null;
+  
+  // Set response headers
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'no-store');
+  
+  // Forward the workspace ID header in the response if present
+  if (workspaceId) {
+    res.setHeader('x-workspace-id', workspaceId);
+  }
   
   res.json({
     workspaceId,
