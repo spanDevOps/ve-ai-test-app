@@ -5,6 +5,30 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// API endpoint to return workspace info
+app.get('/api/workspace-info', (req, res) => {
+  const workspaceId = req.headers['x-workspace-id'] || null;
+  const originalDomain = req.headers['x-debug-original-domain'] || null;
+  
+  // Set response headers
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'no-store');
+  
+  // Forward the workspace ID header in the response if present
+  if (workspaceId) {
+    res.setHeader('x-workspace-id', workspaceId);
+  }
+  
+  res.status(200).json({
+    workspaceId,
+    originalDomain,
+    headers: req.headers
+  });
+});
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Middleware to log all headers to a file
 app.use((req, res, next) => {
   const logEntry = {
@@ -27,30 +51,6 @@ app.use((req, res, next) => {
   
   next();
 });
-
-// API endpoint to return workspace info
-app.get('/api/workspace-info', (req, res) => {
-  const workspaceId = req.headers['x-workspace-id'] || null;
-  const originalDomain = req.headers['x-debug-original-domain'] || null;
-  
-  // Set response headers
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Cache-Control', 'no-store');
-  
-  // Forward the workspace ID header in the response if present
-  if (workspaceId) {
-    res.setHeader('x-workspace-id', workspaceId);
-  }
-  
-  res.json({
-    workspaceId,
-    originalDomain,
-    headers: req.headers
-  });
-});
-
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Catch-all route for SPA
 app.get('*', (req, res) => {
