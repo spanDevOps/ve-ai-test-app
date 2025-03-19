@@ -5,10 +5,26 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log('\n--- Incoming Request ---');
+  console.log('URL:', req.url);
+  console.log('Method:', req.method);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  console.log('----------------------\n');
+  next();
+});
+
 // API endpoint to return workspace info
 app.get('/api/workspace-info', (req, res) => {
+  console.log('API endpoint hit');
+  console.log('Headers received:', JSON.stringify(req.headers, null, 2));
+  
   const workspaceId = req.headers['x-workspace-id'] || null;
   const originalDomain = req.headers['x-debug-original-domain'] || null;
+  
+  console.log('Workspace ID:', workspaceId);
+  console.log('Original Domain:', originalDomain);
   
   // Set response headers
   res.setHeader('Content-Type', 'application/json');
@@ -19,11 +35,14 @@ app.get('/api/workspace-info', (req, res) => {
     res.setHeader('x-workspace-id', workspaceId);
   }
   
-  res.status(200).json({
+  const response = {
     workspaceId,
     originalDomain,
     headers: req.headers
-  });
+  };
+  
+  console.log('Sending response:', JSON.stringify(response, null, 2));
+  res.status(200).json(response);
 });
 
 // Serve static files from the public directory
