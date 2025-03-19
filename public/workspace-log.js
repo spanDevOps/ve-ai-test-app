@@ -1,15 +1,19 @@
 // Simple script to log workspace ID information to the console
 console.log('Workspace ID Logging Script - Starting...');
 
-// Function to fetch workspace info from API
-async function getWorkspaceInfo() {
+// Log current page info
+console.log('Page URL:', window.location.href);
+console.log('Host:', window.location.host);
+
+// Function to fetch workspace info from API with explicit header logging
+async function checkWorkspaceHeader() {
   try {
-    console.log('Fetching workspace info...');
+    console.log('Making request to test endpoint...');
     
     // Add cache-busting parameter
     const timestamp = new Date().getTime();
     
-    // Make the request to the workspace info API
+    // Make a request
     const response = await fetch(`/api/workspace-info?_=${timestamp}`, {
       method: 'GET',
       headers: {
@@ -18,45 +22,50 @@ async function getWorkspaceInfo() {
       }
     });
     
-    console.log('API response status:', response.status);
+    console.log('Response status:', response.status);
     
-    // Log all response headers
-    console.log('API response headers:');
-    const allHeaders = {};
+    // Log all response headers with special attention to workspace headers
+    console.log('--- RESPONSE HEADERS ---');
+    let foundWorkspaceHeader = false;
     response.headers.forEach((value, name) => {
       console.log(`${name}: ${value}`);
-      allHeaders[name] = value;
+      
+      // Check for any workspace-related headers (case insensitive)
+      const lowerName = name.toLowerCase();
+      if (lowerName.includes('workspace') || lowerName.includes('x-amz')) {
+        console.log(` FOUND SPECIAL HEADER: ${name}: ${value}`);
+        foundWorkspaceHeader = true;
+      }
     });
     
-    // Try to parse the response as JSON
-    try {
-      const data = await response.json();
-      console.log('API response data:', data);
-    } catch (jsonError) {
-      console.log('Could not parse response as JSON, showing raw text:');
-      const text = await response.text();
-      console.log(text.substring(0, 500) + '...');
+    if (!foundWorkspaceHeader) {
+      console.log(' No workspace-related headers found in the response');
     }
+    
+    // Log document cookies
+    console.log('--- COOKIES ---');
+    console.log(document.cookie);
+    
+    // Try to find workspace information in cookies
+    const cookies = document.cookie.split(';').map(c => c.trim());
+    const workspaceCookie = cookies.find(c => 
+      c.toLowerCase().startsWith('x_workspace_id=') || 
+      c.toLowerCase().startsWith('x-workspace-id=') ||
+      c.toLowerCase().includes('workspace')
+    );
+    
+    if (workspaceCookie) {
+      console.log(` FOUND WORKSPACE COOKIE: ${workspaceCookie}`);
+    } else {
+      console.log(' No workspace-related cookie found');
+    }
+
   } catch (error) {
     console.error('Error fetching workspace info:', error);
   }
 }
 
-// Log current page info
-console.log('Page URL:', window.location.href);
-console.log('Host:', window.location.host);
-
-// Run the fetch
-getWorkspaceInfo();
-
-// Also log document cookies
-console.log('Document cookies:', document.cookie);
-
-// Log request headers using fetch to test endpoint
-fetch('/api/workspace-info')
-  .then(response => {
-    console.log('Request made to test endpoint');
-  })
-  .catch(e => console.error('Error making test request:', e));
+// Run the checks
+checkWorkspaceHeader();
 
 console.log('Workspace ID Logging Script - Completed initialization');
