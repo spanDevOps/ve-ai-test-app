@@ -3,10 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raw Headers Check</title>
+    <title>Headers Check Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #f4f4f4;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .workspace-highlight {
+            background-color: #ffe3e0;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Raw Request Headers Check</h1>
-    <p>Check the server console for raw request headers</p>
+    <div class="container">
+        <h1>Headers Check Dashboard</h1>
+        <p>This page helps verify whether CloudFront is passing the workspace ID headers to the Amplify app.</p>
+        
+        <button id="fetchHeaders">Fetch Headers Now</button>
+        
+        <div class="card">
+            <h2>API Headers Response</h2>
+            <div id="headersResult">Click the button above to fetch headers.</div>
+        </div>
+        
+        <div class="card">
+            <h2>Server Logs</h2>
+            <p>The server is also logging all headers to the console. Check CloudWatch for logs.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fetchHeaders').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/headers', {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const resultDiv = document.getElementById('headersResult');
+                
+                // Create formatted output
+                let output = '<div class="header">All Headers:</div>';
+                output += `<pre>${JSON.stringify(data.headers, null, 2)}</pre>`;
+                
+                // Highlight workspace headers
+                output += '<div class="header">Workspace Headers:</div>';
+                output += `<div class="workspace-highlight">x-workspace-id: ${data.workspaceId}</div>`;
+                output += `<div class="workspace-highlight">x-amz-workspace-id: ${data.amzWorkspaceId}</div>`;
+                
+                resultDiv.innerHTML = output;
+            } catch (error) {
+                document.getElementById('headersResult').innerHTML = 
+                    `<div style="color: red;">Error fetching headers: ${error.message}</div>`;
+            }
+        });
+    </script>
 </body>
 </html>
