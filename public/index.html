@@ -41,7 +41,8 @@
     <div class="container">
         <h1>Workspace ID Test Page</h1>
         <div id="workspace-info">Loading workspace info...</div>
-        <div id="header-info">Checking for x-workspace-id header...</div>
+        <div id="original-header-info">Checking for x-workspace-id header...</div>
+        <div id="amz-header-info">Checking for x-amz-workspace-id header...</div>
         
         <h3>All Response Headers</h3>
         <pre id="all-headers">Loading headers...</pre>
@@ -71,36 +72,50 @@
                     allHeaders[name] = value;
                 });
                 
-                // Check for workspace ID header
+                // Check for workspace ID headers
                 const workspaceIdHeader = response.headers.get('x-workspace-id');
+                const amzWorkspaceIdHeader = response.headers.get('x-amz-workspace-id');
+                
                 console.log('X-Workspace-Id header:', workspaceIdHeader);
+                console.log('X-Amz-Workspace-Id header:', amzWorkspaceIdHeader);
                 
                 // Display all headers
                 document.getElementById('all-headers').textContent = 
                     JSON.stringify(allHeaders, null, 2);
                 
-                // Update header info
+                // Update original header info
                 if (workspaceIdHeader) {
-                    document.getElementById('header-info').innerHTML = 
+                    document.getElementById('original-header-info').innerHTML = 
                         `<span class="success">✓ Found x-workspace-id header: ${workspaceIdHeader}</span>`;
                 } else {
-                    document.getElementById('header-info').innerHTML = 
+                    document.getElementById('original-header-info').innerHTML = 
                         `<span class="error">✗ No x-workspace-id header found in response</span>`;
+                }
+                
+                // Update AMZ header info
+                if (amzWorkspaceIdHeader) {
+                    document.getElementById('amz-header-info').innerHTML = 
+                        `<span class="success">✓ Found x-amz-workspace-id header: ${amzWorkspaceIdHeader}</span>`;
+                } else {
+                    document.getElementById('amz-header-info').innerHTML = 
+                        `<span class="error">✗ No x-amz-workspace-id header found in response</span>`;
                 }
                 
                 // Parse response JSON
                 const data = await response.json();
                 console.log('API response data:', data);
                 
-                // Update workspace info
+                // Update workspace info - prefer amz header if available
+                const effectiveWorkspaceId = amzWorkspaceIdHeader || workspaceIdHeader;
                 document.getElementById('workspace-info').textContent = 
-                    workspaceIdHeader ? `Current Workspace: ${workspaceIdHeader}` : 'No workspace ID found';
+                    effectiveWorkspaceId ? `Current Workspace: ${effectiveWorkspaceId}` : 'No workspace ID found';
                 
                 // Display debug info
                 const debugInfo = {
                     'Page URL': window.location.href,
                     'Host': window.location.host,
-                    'Workspace ID from Header': workspaceIdHeader || 'Not available',
+                    'Original Workspace ID': workspaceIdHeader || 'Not available',
+                    'AMZ Workspace ID': amzWorkspaceIdHeader || 'Not available',
                     'Response Status': response.status,
                     'Response Type': response.headers.get('content-type'),
                     'Headers Count': Object.keys(allHeaders).length
@@ -114,7 +129,8 @@
             } catch (error) {
                 console.error('Error fetching workspace info:', error);
                 document.getElementById('workspace-info').textContent = 'Error loading workspace info';
-                document.getElementById('header-info').textContent = 'Error checking headers';
+                document.getElementById('original-header-info').textContent = 'Error checking headers';
+                document.getElementById('amz-header-info').textContent = 'Error checking headers';
                 document.getElementById('all-headers').textContent = error.toString();
                 document.getElementById('debug-info').textContent = 'Error loading debug info';
             }
