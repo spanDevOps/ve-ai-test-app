@@ -17,11 +17,42 @@
         .debug-info h3 {
             margin-top: 0;
         }
+        .header-info {
+            background: #e0f7fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: 1px solid #80deea;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <h1>Workspace Test Page</h1>
     <div id="workspace-info">Loading workspace info...</div>
+
+    <div class="header-info">
+        <h3>X-Workspace-Id Header</h3>
+        <div id="header-info">Checking for x-workspace-id header...</div>
+    </div>
+
+    <div class="debug-info">
+        <h3>All Request Headers</h3>
+        <pre id="all-headers">Loading headers...</pre>
+    </div>
 
     <div class="debug-info">
         <h3>Debug Information</h3>
@@ -32,8 +63,36 @@
         async function getWorkspaceInfo() {
             try {
                 // Create a new API endpoint that returns the workspace ID as JSON
-                const response = await fetch('/api/workspace-info');
+                const response = await fetch('/api/workspace-info', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                // Log all response headers to console
+                console.log('Response headers:');
+                const allHeaders = {};
+                response.headers.forEach((value, name) => {
+                    console.log(`${name}: ${value}`);
+                    allHeaders[name] = value;
+                });
+                
+                // Specifically log and display the x-workspace-id header
+                const workspaceIdHeader = response.headers.get('x-workspace-id');
+                console.log('X-Workspace-Id header:', workspaceIdHeader);
+                
+                document.getElementById('header-info').innerHTML = 
+                    workspaceIdHeader 
+                        ? `<div class="success">X-Workspace-Id header found: ${workspaceIdHeader}</div>` 
+                        : '<div class="error">X-Workspace-Id header not found in response!</div>';
+                
                 const data = await response.json();
+                
+                // Display all request headers that the server received
+                document.getElementById('all-headers').textContent = JSON.stringify(data.headers, null, 2);
+                
                 const workspaceId = data.workspaceId;
                 const originalDomain = data.originalDomain;
 
@@ -50,7 +109,10 @@
                 const debugInfo = {
                     'Amplify Host': window.location.host,
                     'Original Domain': originalDomain || 'Not available',
-                    'Workspace ID': workspaceId || 'Not available'
+                    'Workspace ID from API': workspaceId || 'Not available',
+                    'Workspace ID from Header': workspaceIdHeader || 'Not available',
+                    'Request Headers Count': Object.keys(data.headers).length,
+                    'Response Headers Count': Object.keys(allHeaders).length
                 };
 
                 document.getElementById('debug-info').innerHTML = 
@@ -61,12 +123,37 @@
             } catch (error) {
                 console.error('Error fetching workspace info:', error);
                 document.getElementById('workspace-info').textContent = 'Error loading workspace info';
+                document.getElementById('header-info').textContent = 'Error checking headers';
+                document.getElementById('all-headers').textContent = error.toString();
                 document.getElementById('debug-info').textContent = 'Error loading debug info';
+            }
+        }
+
+        // Also make a direct fetch to the root to check headers on non-API requests
+        async function checkRootHeaders() {
+            try {
+                const response = await fetch('/', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                console.log('Root response headers:');
+                response.headers.forEach((value, name) => {
+                    console.log(`${name}: ${value}`);
+                });
+                
+                const workspaceIdHeader = response.headers.get('x-workspace-id');
+                console.log('Root X-Workspace-Id header:', workspaceIdHeader);
+            } catch (error) {
+                console.error('Error checking root headers:', error);
             }
         }
 
         // Fetch workspace info when page loads
         getWorkspaceInfo();
+        checkRootHeaders();
     </script>
 </body>
 </html>

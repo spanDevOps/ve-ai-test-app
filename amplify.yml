@@ -1,14 +1,21 @@
 version: 1
 frontend:
   phases:
+    preBuild:
+      commands:
+        - npm install
     build:
-      commands: []
+      commands:
+        - npm run build
   artifacts:
     baseDirectory: public
     files:
       - '**/*'
+      - '../server.js'
+      - '../package.json'
   cache:
-    paths: []
+    paths:
+      - node_modules/**/*
   customRules:
     - source: /workspace-<*>/<**>
       target: /index.html
