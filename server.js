@@ -7,17 +7,36 @@ const PORT = process.env.PORT || 3000;
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
-  console.log('\n--- Incoming Request ---');
-  console.log('URL:', req.url);
-  console.log('Method:', req.method);
-  console.log('Headers:', JSON.stringify(req.headers, null, 2));
-  console.log('----------------------\n');
+  console.log('\n=== Incoming Request ===');
+  console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`URL: ${req.url}`);
+  console.log(`Method: ${req.method}`);
+  console.log('Headers:');
+  Object.entries(req.headers).forEach(([key, value]) => {
+    console.log(`  ${key}: ${value}`);
+  });
+  console.log('======================\n');
+
+  // Log to file
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    url: req.url,
+    method: req.method,
+    headers: req.headers
+  };
+  
+  fs.appendFileSync(
+    path.join(__dirname, 'header-logs.txt'),
+    JSON.stringify(logEntry, null, 2) + '\n\n',
+    { flag: 'a+' }
+  );
+  
   next();
 });
 
 // API endpoint to return workspace info
 app.get('/api/workspace-info', (req, res) => {
-  console.log('API endpoint hit');
+  console.log('=== API endpoint hit ===');
   console.log('Headers received:', JSON.stringify(req.headers, null, 2));
   
   const workspaceId = req.headers['x-workspace-id'] || null;
@@ -30,7 +49,6 @@ app.get('/api/workspace-info', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'no-store');
   
-  // Forward the workspace ID header in the response if present
   if (workspaceId) {
     res.setHeader('x-workspace-id', workspaceId);
   }
@@ -38,38 +56,18 @@ app.get('/api/workspace-info', (req, res) => {
   const response = {
     workspaceId,
     originalDomain,
-    headers: req.headers
+    headers: req.headers,
+    timestamp: new Date().toISOString()
   };
   
   console.log('Sending response:', JSON.stringify(response, null, 2));
+  console.log('=====================\n');
+  
   res.status(200).json(response);
 });
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Middleware to log all headers to a file
-app.use((req, res, next) => {
-  const logEntry = {
-    timestamp: new Date().toISOString(),
-    method: req.method,
-    url: req.url,
-    headers: req.headers
-  };
-  
-  // Log to console
-  console.log('Request received:');
-  console.log(JSON.stringify(logEntry, null, 2));
-  
-  // Log to file
-  fs.appendFileSync(
-    path.join(__dirname, 'header-logs.txt'),
-    JSON.stringify(logEntry, null, 2) + '\n\n',
-    { flag: 'a+' }
-  );
-  
-  next();
-});
 
 // Catch-all route for SPA
 app.get('*', (req, res) => {
