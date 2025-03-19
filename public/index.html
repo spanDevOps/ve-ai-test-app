@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace ID Test</title>
+    <!-- Amplify Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/aws-amplify@5.0.5/dist/aws-amplify.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,6 +37,12 @@
             border-radius: 5px;
             overflow-x: auto;
         }
+        .log-controls {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -49,15 +57,42 @@
         <h3>Response Body</h3>
         <pre id="response-body">Loading response body...</pre>
         
+        <div class="log-controls">
+            <h3>Amplify Logging</h3>
+            <button onclick="enableAmplifyLogs()">Enable Amplify DEBUG Logs</button>
+            <button onclick="disableAmplifyLogs()">Disable Amplify Logs</button>
+        </div>
+        
         <div class="debug-info" id="debug-info">Loading debug info...</div>
     </div>
 
     <script>
+        // Initialize Amplify Logger
+        const logger = new AWS.Amplify.Logger('WorkspaceTest');
+        logger.info('Initializing Workspace Test App');
+        
+        // Toggle Amplify logging functions
+        function enableAmplifyLogs() {
+            AWS.Amplify.Logger.LOG_LEVEL = 'DEBUG';
+            logger.info('Amplify DEBUG logging enabled');
+            document.getElementById('debug-info').innerHTML += '<div><strong>Amplify Logs:</strong> Enabled at DEBUG level</div>';
+        }
+        
+        function disableAmplifyLogs() {
+            AWS.Amplify.Logger.LOG_LEVEL = 'ERROR';
+            logger.info('Amplify logging disabled (ERROR level only)');
+            document.getElementById('debug-info').innerHTML += '<div><strong>Amplify Logs:</strong> Disabled (ERROR level only)</div>';
+        }
+        
         // Function to fetch workspace info from API
         async function getWorkspaceInfo() {
             try {
+                logger.debug('Starting workspace info fetch');
+                
                 // Add cache-busting parameter to prevent caching
                 const timestamp = new Date().getTime();
+                logger.debug('Using timestamp for cache busting:', timestamp);
+                
                 const response = await fetch(`/api/workspace-info?_=${timestamp}`, {
                     method: 'GET',
                     headers: {
@@ -66,11 +101,13 @@
                     }
                 });
                 
+                logger.info('API response received with status:', response.status);
+                
                 // Log all response headers
-                console.log('API response headers:');
+                logger.debug('API response headers:');
                 const allHeaders = {};
                 response.headers.forEach((value, name) => {
-                    console.log(`${name}: ${value}`);
+                    logger.debug(`${name}: ${value}`);
                     allHeaders[name] = value;
                 });
                 
@@ -80,7 +117,7 @@
                 
                 // Parse response JSON
                 const data = await response.json();
-                console.log('API response data:', data);
+                logger.info('API response data:', data);
                 
                 // Display response body
                 document.getElementById('response-body').textContent = 
@@ -104,7 +141,8 @@
                     'Workspace ID': data.workspaceId,
                     'Response Status': response.status,
                     'Response Type': response.headers.get('content-type'),
-                    'Headers Count': Object.keys(allHeaders).length
+                    'Headers Count': Object.keys(allHeaders).length,
+                    'Request Time': new Date().toISOString()
                 };
                 
                 document.getElementById('debug-info').innerHTML = 
@@ -112,8 +150,10 @@
                         .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
                         .join('');
                 
+                logger.info('Workspace info displayed successfully');
+                
             } catch (error) {
-                console.error('Error fetching workspace info:', error);
+                logger.error('Error fetching workspace info:', error);
                 document.getElementById('workspace-info').innerHTML = 
                     '<span class="error">Error loading workspace info</span>';
                 document.getElementById('response-info').innerHTML = 
@@ -124,6 +164,9 @@
                     `<div class="error">Error: ${error.message}</div>`;
             }
         }
+        
+        // Set default logging level to INFO
+        AWS.Amplify.Logger.LOG_LEVEL = 'INFO';
         
         // Fetch workspace info when page loads
         getWorkspaceInfo();
