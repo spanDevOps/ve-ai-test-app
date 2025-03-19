@@ -1,0 +1,4 @@
+{
+  "message": "This is a static JSON file that simulates the API response",
+  "note": "The actual workspace ID should be passed via the x-workspace-id header"
+}

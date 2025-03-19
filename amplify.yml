@@ -7,38 +7,32 @@ frontend:
     build:
       commands:
         - npm run build
-    postBuild:
-      commands:
-        - node server.js &
   artifacts:
     baseDirectory: public
     files:
       - '**/*'
-      - '../server.js'
-      - '../package.json'
   cache:
     paths:
       - node_modules/**/*
+  customHeaders:
+    - pattern: '**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'no-store'
+    - pattern: '/api/*'
+      headers:
+        - key: 'Access-Control-Allow-Origin'
+          value: '*'
+        - key: 'Access-Control-Allow-Headers'
+          value: '*'
+        - key: 'Access-Control-Expose-Headers'
+          value: 'x-workspace-id'
   customRules:
-    - source: /api/<**>
-      target: /api/$1
-      status: "200"
+    - source: '/api/workspace-info'
+      target: '/api/workspace-info.json'
+      status: '200'
       condition: null
-    - source: /workspace-<*>/<**>
-      target: /index.html
-      status: "200"
-      condition: null
-      rewrites:
-        - source: /workspace-<*>/<**>
-          target: /workspace-$1/$2
-    - source: /workspace-<*>
-      target: /index.html
-      status: "200"
-      condition: null
-      rewrites:
-        - source: /workspace-<*>
-          target: /workspace-$1
-    - source: /<**>
-      target: /index.html
-      status: "404"
+    - source: '/<*>'
+      target: '/index.html'
+      status: '200'
       condition: null
